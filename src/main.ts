@@ -1,4 +1,4 @@
-import "./styles.css";
+import styles from "./styles.css?inline";
 import { Course, courseUrl, courses } from "./courses";
 
 const appRoot = document.querySelector<HTMLDivElement>("#app");
@@ -11,6 +11,17 @@ const app = appRoot;
 
 let activeCourse = courses[0];
 let query = "";
+
+function injectStyles(): void {
+  if (document.querySelector<HTMLStyleElement>("#course-browser-styles")) {
+    return;
+  }
+
+  const styleElement = document.createElement("style");
+  styleElement.id = "course-browser-styles";
+  styleElement.textContent = styles;
+  document.head.append(styleElement);
+}
 
 const normalize = (value: string) => value.toLowerCase().trim();
 
@@ -129,4 +140,5 @@ function bindEvents(): void {
   });
 }
 
+injectStyles();
 render();
