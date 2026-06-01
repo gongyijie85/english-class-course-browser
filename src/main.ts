@@ -242,6 +242,7 @@ async function renderActivePdf(): Promise<void> {
       const availableWidth = Math.min(viewer.clientWidth - 32, 980);
       const scale = Math.max(0.8, availableWidth / baseViewport.width);
       const viewport = page.getViewport({ scale });
+      const outputScale = Math.min(window.devicePixelRatio || 1, 2.5);
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
 
@@ -249,12 +250,18 @@ async function renderActivePdf(): Promise<void> {
         throw new Error("Canvas is not supported in this browser.");
       }
 
-      canvas.width = Math.floor(viewport.width);
-      canvas.height = Math.floor(viewport.height);
+      canvas.width = Math.floor(viewport.width * outputScale);
+      canvas.height = Math.floor(viewport.height * outputScale);
+      canvas.style.width = `${Math.floor(viewport.width)}px`;
+      canvas.style.height = `${Math.floor(viewport.height)}px`;
       canvas.setAttribute("aria-label", `${course.title} 第 ${pageNumber} 页`);
       viewer.append(canvas);
 
-      await page.render({ canvasContext: context, viewport }).promise;
+      await page.render({
+        canvasContext: context,
+        transform: outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : undefined,
+        viewport,
+      }).promise;
     }
   } catch (error) {
     if (currentToken !== renderToken) {
