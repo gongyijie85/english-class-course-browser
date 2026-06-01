@@ -1,5 +1,9 @@
 import styles from "./styles.css?inline";
+import * as pdfjsLib from "pdfjs-dist";
+import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
 import { Course, courseUrl, courses } from "./courses";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
 const appRoot = document.querySelector<HTMLDivElement>("#app");
 
@@ -12,6 +16,7 @@ const app = appRoot;
 let activeCourse: Course | null = null;
 let query = "";
 let activeCategory = "全部";
+let renderToken = 0;
 
 function injectStyles(): void {
   if (document.querySelector<HTMLStyleElement>("#course-browser-styles")) {
@@ -90,11 +95,9 @@ function render(): void {
   const readerTitle = activeCourse?.title ?? "请选择一份课程资料";
   const readerContent = activeCourse
     ? `
-        <iframe
-          title="${activeCourse.title}"
-          src="${courseUrl(activeCourse)}"
-          loading="lazy"
-        ></iframe>
+        <div class="pdf-viewer" id="pdf-viewer" aria-label="${activeCourse.title}">
+          <div class="pdf-loading">正在加载课程 PDF...</div>
+        </div>
       `
     : `
         <div class="reader-empty">
@@ -181,6 +184,7 @@ function render(): void {
   `;
 
   bindEvents();
+  void renderActivePdf();
 }
 
 function bindEvents(): void {
@@ -207,6 +211,63 @@ function bindEvents(): void {
       render();
     });
   });
+}
+
+async function renderActivePdf(): Promise<void> {
+  const viewer = document.querySelector<HTMLDivElement>("#pdf-viewer");
+  const course = activeCourse;
+  const currentToken = ++renderToken;
+
+  if (!viewer || !course) {
+    return;
+  }
+
+  try {
+    const loadingTask = pdfjsLib.getDocument({ url: courseUrl(course) });
+    const pdf = await loadingTask.promise;
+
+    if (currentToken !== renderToken) {
+      return;
+    }
+
+    viewer.innerHTML = "";
+
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+      if (currentToken !== renderToken) {
+        return;
+      }
+
+      const page = await pdf.getPage(pageNumber);
+      const baseViewport = page.getViewport({ scale: 1 });
+      const availableWidth = Math.min(viewer.clientWidth - 32, 980);
+      const scale = Math.max(0.8, availableWidth / baseViewport.width);
+      const viewport = page.getViewport({ scale });
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+
+      if (!context) {
+        throw new Error("Canvas is not supported in this browser.");
+      }
+
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
+      canvas.setAttribute("aria-label", `${course.title} 第 ${pageNumber} 页`);
+      viewer.append(canvas);
+
+      await page.render({ canvas, canvasContext: context, viewport }).promise;
+    }
+  } catch (error) {
+    if (currentToken !== renderToken) {
+      return;
+    }
+
+    viewer.innerHTML = `
+      <div class="pdf-error">
+        <strong>PDF 加载失败</strong>
+        <span>${error instanceof Error ? error.message : "请使用新窗口打开。"}</span>
+      </div>
+    `;
+  }
 }
 
 injectStyles();

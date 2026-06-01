@@ -32,6 +32,9 @@ git push
 The sync command copies PDFs into both `public/pdf` and `pdf`, then updates
 `src/courses.ts`. Render redeploys automatically after `git push`.
 
+The in-page reader uses PDF.js canvas rendering. The browser only downloads a
+file when the user explicitly clicks `下载`.
+
 ## Render Static Site
 
 Use these settings in Render:
