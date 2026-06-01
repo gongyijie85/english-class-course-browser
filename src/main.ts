@@ -254,7 +254,7 @@ async function renderActivePdf(): Promise<void> {
       canvas.setAttribute("aria-label", `${course.title} 第 ${pageNumber} 页`);
       viewer.append(canvas);
 
-      await page.render({ canvas, canvasContext: context, viewport }).promise;
+      await page.render({ canvasContext: context, viewport }).promise;
     }
   } catch (error) {
     if (currentToken !== renderToken) {
