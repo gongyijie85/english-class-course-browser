@@ -1,5 +1,18 @@
 # Changelog
 
+## v2.1.0 - 2026-06-01
+
+### Clarity and Readability Improvements
+
+Comprehensive readability optimization for all 8 course PDFs:
+
+- **Font sizes increased**: body 10pt → 11.5pt, Chinese 9pt → 10.5pt, vocab table 8pt → 9.5pt
+- **Line spacing widened**: leading increased ~20% across all styles (e.g. body 15pt → 18pt)
+- **Contrast improved**: muted color darkened from #5d6d7e → #3d4654, dark text from #1c1917 → #1a1a2e
+- **Margins widened**: 20mm → 22mm for more breathing room
+- **Vocab table**: larger cell padding, thicker grid lines, explicit leading set to 14pt
+- **Footer**: font size 8pt → 9pt, line thickness 0.3 → 0.4
+
 ## v2.0.0 - 2026-06-01
 
 ### Major: Unified PDF Course Material Redesign

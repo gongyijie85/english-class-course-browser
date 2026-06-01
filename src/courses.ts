@@ -21,8 +21,8 @@ export const courses: Course[] = [
     ],
     "summary": "围绕运动、健康习惯和课堂要点整理的阅读资料。",
     "fileName": "课堂要点总结_Exercise_and_Health.pdf",
-    "updated": "2026-06-01 14:26",
-    "size": "178 KB"
+    "updated": "2026-06-01 15:45",
+    "size": "180 KB"
   },
   {
     "id": "speaking-dialogue",
@@ -35,8 +35,8 @@ export const courses: Course[] = [
     ],
     "summary": "适合课堂复盘和跟读练习的英语口语对话材料。",
     "fileName": "英语口语练习_课堂对话版.pdf",
-    "updated": "2026-06-01 14:50",
-    "size": "162 KB"
+    "updated": "2026-06-01 15:45",
+    "size": "164 KB"
   },
   {
     "id": "tense-dialogue",
@@ -49,8 +49,8 @@ export const courses: Course[] = [
     ],
     "summary": "通过对话范文理解常用英语时态的实际表达。",
     "fileName": "英语时态学习资料_对话范文版.pdf",
-    "updated": "2026-06-01 15:10",
-    "size": "148 KB"
+    "updated": "2026-06-01 15:45",
+    "size": "149 KB"
   },
   {
     "id": "lesson11-tenses",
@@ -63,8 +63,8 @@ export const courses: Course[] = [
     ],
     "summary": "Lesson 11 的时态知识点、例句和课堂学习资料。",
     "fileName": "英语时态学习资料_Lesson11.pdf",
-    "updated": "2026-06-01 15:05",
-    "size": "152 KB"
+    "updated": "2026-06-01 15:45",
+    "size": "153 KB"
   },
   {
     "id": "interview-skills",
@@ -77,8 +77,8 @@ export const courses: Course[] = [
     ],
     "summary": "面试场景下的英语表达、学习方法和课堂练习内容。",
     "fileName": "英语学习与面试技巧_课堂版.pdf",
-    "updated": "2026-06-01 15:00",
-    "size": "158 KB"
+    "updated": "2026-06-01 15:45",
+    "size": "160 KB"
   },
   {
     "id": "addictions-notes",
@@ -91,8 +91,8 @@ export const courses: Course[] = [
     ],
     "summary": "Topic notes for discussing addictions, habits, and related vocabulary.",
     "fileName": "English_Class_Notes_Addictions.pdf",
-    "updated": "2026-06-01 14:33",
-    "size": "177 KB"
+    "updated": "2026-06-01 15:45",
+    "size": "179 KB"
   },
   {
     "id": "class-summary",
@@ -105,8 +105,8 @@ export const courses: Course[] = [
     ],
     "summary": "A general class summary for quick review and after-class reading.",
     "fileName": "english_class_summary.pdf",
-    "updated": "2026-06-01 14:45",
-    "size": "190 KB"
+    "updated": "2026-06-01 15:45",
+    "size": "193 KB"
   },
   {
     "id": "trends-dialogue",
@@ -119,8 +119,8 @@ export const courses: Course[] = [
     ],
     "summary": "Dialogue-based material for talking about trends and opinions.",
     "fileName": "English_Lesson_Trends_Dialogue.pdf",
-    "updated": "2026-06-01 14:40",
-    "size": "191 KB"
+    "updated": "2026-06-01 15:45",
+    "size": "192 KB"
   }
 ];
 
