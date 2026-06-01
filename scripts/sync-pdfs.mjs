@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, readdirSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { basename, extname, join, resolve } from "node:path";
 
 const projectRoot = resolve(import.meta.dirname, "..");
@@ -29,12 +29,19 @@ const knownMeta = {
     tags: ["Grammar", "Tenses", "时态"],
     summary: "通过对话范文理解常用英语时态的实际表达。"
   },
-  "英语时态学习资料_Lesson11.pdf": {
-    id: "lesson11-tenses",
-    title: "英语时态学习资料：Lesson 11",
-    category: "语法时态",
-    tags: ["Grammar", "Lesson 11", "时态"],
-    summary: "Lesson 11 的时态知识点、例句和课堂学习资料。"
+  "英语发音课程学习资料.pdf": {
+    id: "pronunciation-course",
+    title: "英语发音课程学习资料",
+    category: "发音训练",
+    tags: ["Pronunciation", "Speaking", "发音"],
+    summary: "围绕音素、重音、连读和句子节奏整理的英语发音训练讲义。"
+  },
+  "英语复合句核心句型复习资料.pdf": {
+    id: "complex-sentences",
+    title: "英语复合句核心句型复习资料",
+    category: "语法句型",
+    tags: ["Grammar", "Sentence Patterns", "复合句"],
+    summary: "复习目的、条件、方式、让步和伴随动作等复合句核心句型。"
   },
   "英语学习与面试技巧_课堂版.pdf": {
     id: "interview-skills",
@@ -124,6 +131,16 @@ mkdirSync(rootPdfDir, { recursive: true });
 const pdfFiles = readdirSync(sourceDir)
   .filter((fileName) => fileName.toLowerCase().endsWith(".pdf"))
   .sort((a, b) => a.localeCompare(b, "zh-CN"));
+
+const sourcePdfSet = new Set(pdfFiles);
+
+for (const targetDir of [publicPdfDir, rootPdfDir]) {
+  for (const fileName of readdirSync(targetDir)) {
+    if (fileName.toLowerCase().endsWith(".pdf") && !sourcePdfSet.has(fileName)) {
+      unlinkSync(join(targetDir, fileName));
+    }
+  }
+}
 
 const courses = pdfFiles.map((fileName) => {
   const sourcePath = join(sourceDir, fileName);
