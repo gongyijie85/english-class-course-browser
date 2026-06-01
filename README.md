@@ -50,6 +50,15 @@ The sync command copies PDFs into both `public/pdf` and `pdf`, then updates
 The in-page reader uses PDF.js canvas rendering. The browser only downloads a
 file when the user explicitly clicks `下载`.
 
+## Translation Plugin (v1.1.0)
+
+Built-in word-translation plugin inspired by Language Reactor:
+
+- **Translate Mode**: Toggle the "翻译模式" button in the reader toolbar. Once on, select any English word or sentence in the PDF to see the Chinese translation.
+- **Translation Popup**: A popup appears near the selection showing the original text and translation. Click "+ 加入生词本" to save it.
+- **Vocabulary Panel**: Click "生词本" to open the vocabulary panel from the right side. All saved words are stored in browser localStorage and persist across sessions.
+- **Translation Source**: Uses the free MyMemory Translation API (rate-limited). Results are cached in memory during the session.
+
 ## Regenerate PDFs
 
 PDF generation scripts are in `D:\English Class\`:

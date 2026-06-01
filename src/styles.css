@@ -351,6 +351,253 @@ h2 {
   background: rgba(255, 253, 248, 0.68);
 }
 
+/* ===== PDF 文本层（支持划词选中） ===== */
+.pdf-page-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 18px;
+}
+
+.textLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  opacity: 0.25;
+  line-height: 1;
+}
+
+.textLayer span,
+.textLayer br {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
+
+.textLayer ::selection {
+  background: rgba(40, 87, 67, 0.4);
+}
+
+/* ===== 翻译与生词本按钮 ===== */
+.translate-toggle,
+.vocab-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  border: 1px solid var(--pine);
+  padding: 8px 12px;
+  color: var(--pine-dark);
+  font-size: 0.86rem;
+  font-weight: 800;
+  background: rgba(40, 87, 67, 0.08);
+  cursor: pointer;
+}
+
+.translate-toggle.is-active {
+  color: #fffaf1;
+  background: var(--pine);
+}
+
+.translate-toggle:hover,
+.vocab-toggle:hover {
+  color: #fffaf1;
+  background: var(--pine);
+}
+
+/* ===== 翻译结果浮窗 ===== */
+.translation-popup {
+  position: absolute;
+  z-index: 100;
+  min-width: 180px;
+  max-width: 320px;
+  border: 1px solid var(--pine);
+  background: var(--panel);
+  box-shadow: 0 8px 24px rgba(46, 42, 34, 0.22);
+  transform: translate(-50%, -100%);
+  margin-top: -8px;
+}
+
+.translation-popup::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--pine);
+}
+
+.translation-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(40, 87, 67, 0.08);
+}
+
+.translation-popup-header strong {
+  color: var(--pine-dark);
+  font-size: 0.95rem;
+  word-break: break-word;
+}
+
+.translation-popup-close {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  border: none;
+  padding: 0;
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  background: none;
+  cursor: pointer;
+}
+
+.translation-popup-close:hover {
+  color: var(--clay);
+}
+
+.translation-popup-body {
+  padding: 10px 12px;
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.translation-popup-actions {
+  display: flex;
+  padding: 8px 12px 10px;
+}
+
+.translation-popup-save {
+  border: 1px solid var(--pine);
+  padding: 6px 10px;
+  color: var(--pine-dark);
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: rgba(212, 166, 44, 0.16);
+  cursor: pointer;
+}
+
+.translation-popup-save:hover {
+  color: #fffaf1;
+  background: var(--pine);
+}
+
+.translation-popup-save:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ===== 生词本侧边面板 ===== */
+.vocab-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  max-width: 90vw;
+  height: 100vh;
+  border-left: 1px solid var(--pine);
+  background: var(--panel);
+  box-shadow: -8px 0 24px rgba(46, 42, 34, 0.18);
+}
+
+.vocab-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(40, 87, 67, 0.08);
+}
+
+.vocab-panel-header strong {
+  color: var(--pine-dark);
+  font-size: 1rem;
+}
+
+.vocab-panel-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  padding: 0;
+  color: var(--muted);
+  font-size: 1.2rem;
+  line-height: 1;
+  background: none;
+  cursor: pointer;
+}
+
+.vocab-panel-close:hover {
+  color: var(--clay);
+}
+
+.vocab-panel-body {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 12px 16px;
+}
+
+.vocab-empty {
+  margin: 24px 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.vocab-item {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 10px;
+  border: 1px solid var(--line);
+  padding: 10px 12px;
+  background: #fffdf8;
+}
+
+.vocab-item-word {
+  color: var(--pine-dark);
+  font-weight: 700;
+  font-size: 0.92rem;
+  word-break: break-word;
+}
+
+.vocab-item-trans {
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.vocab-item-delete {
+  justify-self: end;
+  width: 24px;
+  height: 24px;
+  border: none;
+  padding: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  background: none;
+  cursor: pointer;
+}
+
+.vocab-item-delete:hover {
+  color: var(--clay);
+}
+
 @media (max-width: 900px) {
   .shell {
     grid-template-columns: 1fr;

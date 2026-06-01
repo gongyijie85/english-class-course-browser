@@ -1,22 +1,264 @@
 import styles from "./styles.css?inline";
 import * as pdfjsLib from "pdfjs-dist";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
+import * as pdfViewer from "pdfjs-dist/web/pdf_viewer.mjs";
 import { Course, courseUrl, courses } from "./courses";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
 const appRoot = document.querySelector<HTMLDivElement>("#app");
-
 if (!appRoot) {
   throw new Error("Missing app root");
 }
-
 const app = appRoot;
 
 let activeCourse: Course | null = null;
 let query = "";
 let activeCategory = "全部";
 let renderToken = 0;
+
+/* ============================================================
+   翻译与生词本模块
+   ============================================================ */
+
+let isTranslateMode = false;
+let showVocabPanel = false;
+const translationCache = new Map<string, string>();
+
+interface VocabItem {
+  word: string;
+  translation: string;
+  timestamp: number;
+}
+
+const VOCAB_KEY = "english-class-vocab";
+
+function escapeHtml(text: string): string {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function getVocabulary(): VocabItem[] {
+  try {
+    return JSON.parse(localStorage.getItem(VOCAB_KEY) ?? "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveVocabulary(vocab: VocabItem[]): void {
+  localStorage.setItem(VOCAB_KEY, JSON.stringify(vocab));
+}
+
+function addToVocabulary(word: string, translation: string): void {
+  const vocab = getVocabulary();
+  if (!vocab.some((v) => v.word === word)) {
+    vocab.unshift({ word, translation, timestamp: Date.now() });
+    saveVocabulary(vocab);
+  }
+}
+
+function removeFromVocabulary(word: string): void {
+  saveVocabulary(getVocabulary().filter((v) => v.word !== word));
+}
+
+async function translateText(text: string): Promise<string> {
+  const trimmed = text.trim();
+  if (!trimmed || trimmed.length > 300) return "";
+  if (/^[\u4e00-\u9fa5\s\p{P}]+$/u.test(trimmed)) return "";
+  if (trimmed.length < 2) return "";
+
+  if (translationCache.has(trimmed)) return translationCache.get(trimmed)!;
+
+  try {
+    const response = await fetch(
+      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(trimmed)}&langpair=en|zh-CN`,
+    );
+    const data = await response.json();
+    const result = data.responseData?.translatedText ?? "";
+    if (result && result.toLowerCase() !== trimmed.toLowerCase()) {
+      translationCache.set(trimmed, result);
+    }
+    return result;
+  } catch {
+    return "";
+  }
+}
+
+/* ============================================================
+   翻译浮窗
+   ============================================================ */
+
+let currentPopup: HTMLDivElement | null = null;
+
+function showTranslationPopup(
+  original: string,
+  translation: string,
+  x: number,
+  y: number,
+): void {
+  hideTranslationPopup();
+
+  const popup = document.createElement("div");
+  popup.className = "translation-popup";
+  popup.innerHTML = `
+    <div class="translation-popup-header">
+      <strong>${escapeHtml(original)}</strong>
+      <button class="translation-popup-close" type="button" aria-label="关闭">×</button>
+    </div>
+    <div class="translation-popup-body">${escapeHtml(translation)}</div>
+    <div class="translation-popup-actions">
+      <button class="translation-popup-save" type="button">+ 加入生词本</button>
+    </div>
+  `;
+
+  popup
+    .querySelector(".translation-popup-close")
+    ?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      hideTranslationPopup();
+    });
+
+  popup
+    .querySelector(".translation-popup-save")
+    ?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      addToVocabulary(original, translation);
+      renderVocabPanel();
+      const btn = popup.querySelector(
+        ".translation-popup-save",
+      ) as HTMLButtonElement;
+      btn.textContent = "已收藏";
+      btn.disabled = true;
+    });
+
+  const viewer = document.querySelector<HTMLElement>("#pdf-viewer");
+  if (viewer) {
+    const viewerRect = viewer.getBoundingClientRect();
+    const left = x - viewerRect.left;
+    const top = y - viewerRect.top - 8;
+    popup.style.left = `${left}px`;
+    popup.style.top = `${top}px`;
+  }
+
+  viewer?.appendChild(popup);
+  currentPopup = popup;
+}
+
+function hideTranslationPopup(): void {
+  currentPopup?.remove();
+  currentPopup = null;
+}
+
+/* ============================================================
+   生词本面板
+   ============================================================ */
+
+function renderVocabPanel(): void {
+  document.querySelector<HTMLDivElement>(".vocab-panel")?.remove();
+  if (!showVocabPanel) return;
+
+  const vocab = getVocabulary();
+  const panel = document.createElement("div");
+  panel.className = "vocab-panel";
+  panel.innerHTML = `
+    <div class="vocab-panel-header">
+      <strong>生词本 (${vocab.length})</strong>
+      <button class="vocab-panel-close" type="button" aria-label="关闭">×</button>
+    </div>
+    <div class="vocab-panel-body">
+      ${
+        vocab.length === 0
+          ? `<p class="vocab-empty">暂无收藏<br>开启翻译模式后选中单词即可收藏</p>`
+          : vocab
+              .map(
+                (item) => `
+            <div class="vocab-item">
+              <div class="vocab-item-word">${escapeHtml(item.word)}</div>
+              <div class="vocab-item-trans">${escapeHtml(item.translation)}</div>
+              <button class="vocab-item-delete" data-word="${escapeHtml(item.word)}" type="button" aria-label="删除">×</button>
+            </div>
+          `,
+              )
+              .join("")
+      }
+    </div>
+  `;
+
+  panel
+    .querySelector(".vocab-panel-close")
+    ?.addEventListener("click", () => {
+      showVocabPanel = false;
+      renderVocabPanel();
+    });
+
+  panel
+    .querySelectorAll<HTMLButtonElement>(".vocab-item-delete")
+    .forEach((btn) => {
+      btn.addEventListener("click", () => {
+        removeFromVocabulary(btn.dataset.word ?? "");
+        renderVocabPanel();
+      });
+    });
+
+  document.body.appendChild(panel);
+}
+
+/* ============================================================
+   划词翻译事件监听
+   ============================================================ */
+
+function setupTranslateListener(): void {
+  document.addEventListener("mouseup", async (e) => {
+    if (!isTranslateMode) {
+      hideTranslationPopup();
+      return;
+    }
+
+    const target = e.target as HTMLElement;
+    if (
+      target.closest(".translation-popup") ||
+      target.closest(".vocab-panel")
+    ) {
+      return;
+    }
+
+    const selection = window.getSelection();
+    const selectedText = selection?.toString().trim() ?? "";
+
+    if (!selectedText || selectedText.length > 300) {
+      hideTranslationPopup();
+      return;
+    }
+
+    const viewer = document.querySelector("#pdf-viewer");
+    if (!viewer) return;
+
+    const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
+    if (!range) return;
+
+    if (!viewer.contains(range.commonAncestorContainer)) return;
+
+    const rect = range.getBoundingClientRect();
+    const translation = await translateText(selectedText);
+
+    if (translation) {
+      showTranslationPopup(
+        selectedText,
+        translation,
+        rect.left + rect.width / 2,
+        rect.top,
+      );
+    } else {
+      hideTranslationPopup();
+    }
+  });
+}
+
+/* ============================================================
+   原有核心逻辑（课程浏览 + PDF 渲染）
+   ============================================================ */
 
 function injectStyles(): void {
   if (document.querySelector<HTMLStyleElement>("#course-browser-styles")) {
@@ -42,7 +284,9 @@ function matchesCourse(course: Course, search: string): boolean {
   }
 
   const haystack = normalize(
-    [course.title, course.fileName, course.summary, course.tags.join(" ")].join(" ")
+    [course.title, course.fileName, course.summary, course.tags.join(" ")].join(
+      " ",
+    ),
   );
 
   return haystack.includes(normalizedSearch);
@@ -104,10 +348,13 @@ function render(): void {
           <p class="eyebrow">Ready</p>
           <h2>选择左侧资料后开始阅读</h2>
           <p>只有点击“阅读”才会加载 PDF；标签、搜索和分类不会触发下载。</p>
+          <p style="margin-top:12px;color:var(--pine);font-size:0.85rem;">提示：加载 PDF 后可开启“翻译模式”，选中单词或句子即可查看中文翻译。</p>
         </div>
       `;
   const readerActions = activeCourse
     ? `
+        <button class="translate-toggle ${isTranslateMode ? "is-active" : ""}" type="button" data-action="toggle-translate">翻译模式${isTranslateMode ? "：开" : ""}</button>
+        <button class="vocab-toggle" type="button" data-action="toggle-vocab">生词本</button>
         <a href="${courseUrl(activeCourse)}" target="_blank" rel="noreferrer">新窗口</a>
         <a href="${courseUrl(activeCourse)}" download="${activeCourse.fileName}">下载</a>
       `
@@ -145,7 +392,7 @@ function render(): void {
                   data-action="filter"
                   data-category="${category}"
                 >${category}</button>
-              `
+              `,
             )
             .join("")}
         </div>
@@ -160,7 +407,7 @@ function render(): void {
                         <h3>${category}</h3>
                         ${categoryCourses.map(renderCourseCard).join("")}
                       </section>
-                    `
+                    `,
                   )
                   .join("")
               : `<p class="empty-state">没有找到匹配的课程资料。</p>`
@@ -185,6 +432,7 @@ function render(): void {
 
   bindEvents();
   void renderActivePdf();
+  renderVocabPanel();
 }
 
 function bindEvents(): void {
@@ -195,22 +443,44 @@ function bindEvents(): void {
     document.querySelector<HTMLInputElement>("#course-search")?.focus();
   });
 
-  document.querySelectorAll<HTMLButtonElement>("[data-action='select']").forEach((button) => {
-    button.addEventListener("click", () => {
-      const selected = courses.find((course) => course.id === button.dataset.courseId);
-      if (selected) {
-        activeCourse = selected;
-        render();
-      }
+  document
+    .querySelectorAll<HTMLButtonElement>("[data-action='select']")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const selected = courses.find((course) => course.id === button.dataset.courseId);
+        if (selected) {
+          activeCourse = selected;
+          render();
+        }
+      });
     });
-  });
 
-  document.querySelectorAll<HTMLButtonElement>("[data-action='filter']").forEach((button) => {
-    button.addEventListener("click", () => {
-      activeCategory = button.dataset.category ?? "全部";
-      render();
+  document
+    .querySelectorAll<HTMLButtonElement>("[data-action='filter']")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        activeCategory = button.dataset.category ?? "全部";
+        render();
+      });
     });
-  });
+
+  document
+    .querySelectorAll<HTMLButtonElement>("[data-action='toggle-translate']")
+    .forEach((btn) => {
+      btn.addEventListener("click", () => {
+        isTranslateMode = !isTranslateMode;
+        render();
+      });
+    });
+
+  document
+    .querySelectorAll<HTMLButtonElement>("[data-action='toggle-vocab']")
+    .forEach((btn) => {
+      btn.addEventListener("click", () => {
+        showVocabPanel = !showVocabPanel;
+        renderVocabPanel();
+      });
+    });
 }
 
 async function renderActivePdf(): Promise<void> {
@@ -243,6 +513,10 @@ async function renderActivePdf(): Promise<void> {
       const scale = Math.max(0.8, availableWidth / baseViewport.width);
       const viewport = page.getViewport({ scale });
       const outputScale = Math.min(window.devicePixelRatio || 1, 2.5);
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "pdf-page-wrapper";
+
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
 
@@ -255,13 +529,25 @@ async function renderActivePdf(): Promise<void> {
       canvas.style.width = `${Math.floor(viewport.width)}px`;
       canvas.style.height = `${Math.floor(viewport.height)}px`;
       canvas.setAttribute("aria-label", `${course.title} 第 ${pageNumber} 页`);
-      viewer.append(canvas);
+
+      wrapper.appendChild(canvas);
+      viewer.appendChild(wrapper);
 
       await page.render({
         canvasContext: context,
         transform: outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : undefined,
         viewport,
       }).promise;
+
+      if (currentToken !== renderToken) {
+        return;
+      }
+
+      const textLayerBuilder = new pdfViewer.TextLayerBuilder({ pdfPage: page });
+      await textLayerBuilder.render(viewport);
+      textLayerBuilder.div.style.width = `${Math.floor(viewport.width)}px`;
+      textLayerBuilder.div.style.height = `${Math.floor(viewport.height)}px`;
+      wrapper.appendChild(textLayerBuilder.div);
     }
   } catch (error) {
     if (currentToken !== renderToken) {
@@ -279,3 +565,4 @@ async function renderActivePdf(): Promise<void> {
 
 injectStyles();
 render();
+setupTranslateListener();
