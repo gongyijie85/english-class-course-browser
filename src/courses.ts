@@ -84,5 +84,5 @@ export const courses: Course[] = [
 ];
 
 export function courseUrl(course: Course): string {
-  return `/pdf/${encodeURIComponent(course.fileName)}`;
+  return `pdf/${encodeURIComponent(course.fileName)}`;
 }
