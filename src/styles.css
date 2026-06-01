@@ -149,11 +149,23 @@ h2 {
   box-shadow: 0 0 0 4px rgba(180, 90, 60, 0.14);
 }
 
-.course-list {
+.course-list,
+.course-group {
   display: grid;
   gap: 12px;
+}
+
+.course-list {
   overflow: auto;
   padding-right: 2px;
+}
+
+.course-group h3 {
+  margin: 8px 0 0;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 7px;
+  color: var(--pine-dark);
+  font-size: 0.9rem;
 }
 
 .course-card {
@@ -172,19 +184,15 @@ h2 {
   transform: translate(-2px, -2px);
 }
 
-.course-select {
+.course-body {
   display: grid;
   gap: 8px;
   width: 100%;
-  border: 0;
   padding: 16px;
   color: inherit;
-  text-align: left;
-  background: transparent;
-  cursor: pointer;
 }
 
-.course-select strong {
+.course-body strong {
   font-size: 1.05rem;
   line-height: 1.25;
 }
@@ -223,6 +231,7 @@ h2 {
 }
 
 .course-actions a,
+.course-actions button,
 .reader-actions a {
   display: inline-flex;
   align-items: center;
@@ -234,9 +243,11 @@ h2 {
   font-size: 0.86rem;
   font-weight: 800;
   background: rgba(40, 87, 67, 0.08);
+  cursor: pointer;
 }
 
 .course-actions a:hover,
+.course-actions button:hover,
 .reader-actions a:hover {
   color: #fffaf1;
   background: var(--pine);
@@ -247,6 +258,30 @@ h2 {
   align-items: center;
 }
 
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 18px;
+}
+
+.filter-row button {
+  border: 1px solid var(--line);
+  padding: 8px 10px;
+  color: var(--pine-dark);
+  font-size: 0.82rem;
+  font-weight: 800;
+  background: #fffdf8;
+  cursor: pointer;
+}
+
+.filter-row button:hover,
+.filter-row button.is-active {
+  border-color: var(--pine);
+  color: #fffaf1;
+  background: var(--pine);
+}
+
 iframe {
   display: block;
   width: 100%;
@@ -254,6 +289,29 @@ iframe {
   min-height: 460px;
   border: 0;
   background: #f0eee8;
+}
+
+.reader-empty {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  min-height: 460px;
+  padding: 42px;
+  color: var(--muted);
+  background:
+    linear-gradient(135deg, rgba(40, 87, 67, 0.08), transparent 44%),
+    #f0eee8;
+}
+
+.reader-empty h2 {
+  margin-bottom: 10px;
+  color: var(--ink);
+}
+
+.reader-empty p:last-child {
+  max-width: 520px;
+  margin: 0;
+  line-height: 1.6;
 }
 
 .empty-state {

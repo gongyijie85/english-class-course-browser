@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
+    "sync:pdfs": "node scripts/sync-pdfs.mjs",
     "build": "tsc && vite build",
     "preview": "vite preview --host 0.0.0.0"
   },

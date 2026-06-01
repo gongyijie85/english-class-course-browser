@@ -16,6 +16,22 @@ npm run build
 npm run preview
 ```
 
+## Add new PDFs
+
+1. Put new PDF files into `D:\English Class\PDF`.
+2. Run:
+
+```powershell
+npm run sync:pdfs
+npm run build
+git add .
+git commit -m "Add course PDFs"
+git push
+```
+
+The sync command copies PDFs into both `public/pdf` and `pdf`, then updates
+`src/courses.ts`. Render redeploys automatically after `git push`.
+
 ## Render Static Site
 
 Use these settings in Render:
