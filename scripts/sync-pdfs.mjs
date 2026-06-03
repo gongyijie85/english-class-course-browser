@@ -70,6 +70,13 @@ const knownMeta = {
     category: "主题讨论",
     tags: ["Trends", "Dialogue", "Discussion"],
     summary: "Dialogue-based material for talking about trends and opinions."
+  },
+  "English_Learning_Notes_Comprehensive.pdf": {
+    id: "learning-notes-comprehensive",
+    title: "英语综合学习笔记：面试·时态·发音",
+    category: "综合笔记",
+    tags: ["Interview", "Tenses", "Pronunciation", "Vocabulary", "综合"],
+    summary: "覆盖日常表达、面试技巧、核心词汇、元音发音、5种过去与现在时态以及教师范文的综合学习笔记。"
   }
 };
 

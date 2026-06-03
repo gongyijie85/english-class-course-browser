@@ -2,7 +2,7 @@
 
 Static course browser for the PDF files in `public/pdf`.
 
-## Course List (v2.0.0)
+## Course List (v2.2.0)
 
 | Category | Course | Level |
 |----------|--------|-------|
@@ -14,6 +14,7 @@ Static course browser for the PDF files in `public/pdf`.
 | 面试职场 | Interview Skills / 英语学习与面试技巧 | A1-A2 |
 | 语法时态 | English Tenses: Lesson 11 / 英语时态学习资料 | A1-A2 |
 | 语法时态 | English Tenses: Dialogue Practice / 英语时态学习资料：对话范文版 | A1-A2 |
+| 综合笔记 | 英语综合学习笔记：面试·时态·发音（18 页综合复盘） | A1-A2 |
 
 Each course PDF follows a unified structure: Cover, Learning Goals, Warm-up Questions, Key Vocabulary, Useful Expressions, Dialogue/Reading, Guided Practice, Speaking Task, Review, Homework.
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.2.0 - 2026-06-03
+
+### 新增：综合学习笔记（面试 + 时态 + 发音）
+
+- **新增课程 PDF**：`English_Learning_Notes_Comprehensive.pdf`，复制自 `C:\Users\Administrator\Documents\English_Learning_Notes.pdf`
+- **课程元数据**：标题"英语综合学习笔记：面试·时态·发音"，分类"综合笔记"，标签 Interview/Tenses/Pronunciation/Vocabulary
+- **内容覆盖**（18 页）：日常对话、面试技巧、同义词替换表、核心词汇精讲、元音发音规律、5 种过去与现在时态精讲、3 篇教师范文、学习建议
+- **网站同步**：`sync:pdfs` 共同步 9 个 PDF；`build` 输出 dist 正常
+
 ## v1.1.0 - 2026-06-01
 
 ### 新增：划词翻译 + 生词本插件
