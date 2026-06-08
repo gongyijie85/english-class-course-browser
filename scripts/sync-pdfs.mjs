@@ -77,6 +77,13 @@ const knownMeta = {
     category: "综合笔记",
     tags: ["Interview", "Tenses", "Pronunciation", "Vocabulary", "综合"],
     summary: "覆盖日常表达、面试技巧、核心词汇、元音发音、5种过去与现在时态以及教师范文的综合学习笔记。"
+  },
+  "未来社会发展趋势探讨_课程版.pdf": {
+    id: "future-society-trends",
+    title: "未来社会发展趋势探讨",
+    category: "主题讨论",
+    tags: ["Future", "Society", "Trends", "Discussion", "未来"],
+    summary: "围绕 AI 与就业、身份象征、房价与代际、婚恋与生育、个人主义与集体主义、长寿伦理、未来法律、科技与星际、AI 恋爱等 10 个话题展开的未来趋势综合讨论课。"
   }
 };
 
