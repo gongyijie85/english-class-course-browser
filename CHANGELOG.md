@@ -1,5 +1,23 @@
 # Changelog
 
+## v2.4.0 - 2026-06-08
+
+### 修复：PDF 页面被挤压变形
+
+- **根因**：
+  1. CSS 中 `.pdf-viewer canvas { max-width: 100%; height: auto; }` 会在容器宽度变化时，强行把 canvas 等比缩小到容器宽度，破坏 PDF 原本的 A4 比例
+  2. `main.ts` 中 `availableWidth = viewer.clientWidth - 32` 写死了 32px 偏移，但实际 viewer 的 padding 是 `18px*2 = 36px`，与 22px 历史值都不匹配
+  3. reader-toolbar 在长课程标题（"英语复合句核心句型复习资料"等）+ 翻译/生词本按钮下变得很高，把 PDF viewer 高度挤得很小
+  4. `.pdf-page-wrapper` 又有 `margin-bottom: 18px` 又处在 grid 的 `gap: 18px` 里，页间距视觉上是 36px
+- **修复方案**：
+  1. JS 端用 `getComputedStyle` 拿真实 padding，同时按"可用宽度"和"可用高度"双约束取较小 scale，PDF 页面不再被 CSS 强制拉伸
+  2. canvas 移除 `max-width: 100%` 限制，加上 `display: block`，viewer 容器允许横向滚动
+  3. reader-toolbar padding 由 `20px 22px` 收到 `14px 22px`，标题字号减小并允许换行，让 toolbar 更紧凑
+  4. `.reader-panel` 改为 `grid-template-rows: auto minmax(0, 1fr)`，保证 PDF viewer 能被压缩并出现滚动条
+  5. `.pdf-page-wrapper` 去掉 `margin-bottom`，避免与 grid gap 重复造成过大间距
+  6. 加 `Math.max(0.5, ...)` 最小 scale 保护，避免 reader-panel 太矮时内容看不清
+- **效果**：大屏下 PDF 完整显示 A4 比例不会被压缩；窗口收窄时 viewer 出现横向滚动条而不是把页面缩变形；中长课程标题不再撑高 toolbar
+
 ## v2.3.0 - 2026-06-08
 
 ### 修复：PDF.js Worker 加载失败

@@ -541,8 +541,31 @@ async function renderActivePdf(): Promise<void> {
 
       const page = await pdf.getPage(pageNumber);
       const baseViewport = page.getViewport({ scale: 1 });
-      const availableWidth = Math.min(viewer.clientWidth - 32, 980);
-      const scale = Math.max(0.8, availableWidth / baseViewport.width);
+
+      // 关键：用真实的 padding 计算可用宽度，避免 CSS 缩放挤压
+      // PDF 是 A4 比例（1:√2≈1.414），如果用宽度算 scale，页面会按宽度撑满，高度超出时只滚
+      const viewerStyle = window.getComputedStyle(viewer);
+      const paddingX =
+        parseFloat(viewerStyle.paddingLeft || "0") +
+        parseFloat(viewerStyle.paddingRight || "0");
+      const paddingY =
+        parseFloat(viewerStyle.paddingTop || "0") +
+        parseFloat(viewerStyle.paddingBottom || "0");
+      const innerWidth = Math.max(0, viewer.clientWidth - paddingX);
+      const innerHeight = Math.max(0, viewer.clientHeight - paddingY);
+
+      // 留 4px 视觉余量，避免滚动条贴边
+      const maxWidth = Math.max(320, innerWidth - 4);
+
+      // 页面高度上限：可用高度 - 4px 余量 - 页面间距（首尾 18px gap）
+      const maxHeight = Math.max(240, innerHeight - 22);
+
+      // 同一个 scale 同时满足 width 和 height 上限，取较小者
+      // 设最小 0.5 倍 scale 保护，避免 reader-panel 太矮时 PDF 内容被缩到看不清
+      const widthScale = maxWidth / baseViewport.width;
+      const heightScale = maxHeight / baseViewport.height;
+      const scale = Math.max(0.5, Math.min(widthScale, heightScale, 2.5));
+
       const viewport = page.getViewport({ scale });
       const outputScale = Math.min(window.devicePixelRatio || 1, 2.5);
 

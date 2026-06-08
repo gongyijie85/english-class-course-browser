@@ -2,7 +2,7 @@
 
 Static course browser for the PDF files in `public/pdf`.
 
-## Course List (v2.3.0)
+## Course List (v2.4.0)
 
 | Category | Course | Level |
 |----------|--------|-------|
@@ -60,6 +60,16 @@ Built-in word-translation plugin inspired by Language Reactor:
 - **Translation Popup**: A popup appears near the selection showing the original text and translation. Click "+ 加入生词本" to save it.
 - **Vocabulary Panel**: Click "生词本" to open the vocabulary panel from the right side. All saved words are stored in browser localStorage and persist across sessions.
 - **Translation Source**: Uses the free MyMemory Translation API (rate-limited). Results are cached in memory during the session.
+
+## PDF Reader Layout (v2.4.0)
+
+修复 PDF 页面被挤压变形的问题：
+
+- 移除 canvas 的 `max-width: 100%` 强制缩放，PDF 页面按真实 A4 比例渲染
+- 容器变窄时 viewer 出现横向滚动条，而不是把 canvas 缩变形
+- reader-toolbar 收紧高度，长课程标题可换行不撑高
+- 用 `getComputedStyle` 拿真实 padding 计算可用宽高，scale 同时满足宽高上限
+- 加 `Math.max(0.5, ...)` 最小 scale 保护，避免 reader-panel 太矮时内容看不清
 
 ## Regenerate PDFs
 

@@ -66,8 +66,10 @@ a {
 
 .reader-panel {
   display: grid;
-  grid-template-rows: auto minmax(460px, 1fr);
+  /* 关键：minmax(0, 1fr) 让 PDF viewer 在工具栏很高时也能被压缩并出现滚动条 */
+  grid-template-rows: auto minmax(0, 1fr);
   min-width: 0;
+  min-height: 0;
 }
 
 .brand-row,
@@ -79,11 +81,26 @@ a {
 }
 
 .reader-toolbar {
-  padding: 20px 22px;
+  /* 关键：紧凑工具栏高度，给 PDF viewer 留出更多空间，避免页面被"挤压" */
+  padding: 14px 22px;
   border-bottom: 1px solid var(--line);
   background:
     linear-gradient(135deg, rgba(212, 166, 44, 0.18), transparent 38%),
     var(--panel);
+  flex-wrap: wrap;
+}
+
+.reader-toolbar h2 {
+  /* 长课程标题（如"英语复合句核心句型复习资料"）允许换行，但保持行高紧凑 */
+  max-width: 100%;
+  margin-top: 2px;
+  font-size: clamp(1.05rem, 1.6vw, 1.45rem);
+  line-height: 1.15;
+  word-break: break-word;
+}
+
+.reader-toolbar > div {
+  min-width: 0;
 }
 
 .eyebrow {
@@ -337,18 +354,25 @@ h2 {
   justify-items: center;
   align-content: start;
   gap: 18px;
+  /* 用 minmax 让 viewer 在 reader-panel 收缩时仍能保持合理高度 */
   height: 100%;
-  min-height: 460px;
+  min-height: 0;
   overflow: auto;
-  padding: 22px;
+  /* 横向、纵向都能滚动：避免 canvas 因父容器宽度不够被 CSS 强行缩小（"挤压"） */
+  overflow-x: auto;
+  padding: 18px 18px 24px;
   background: #ebe7dd;
 }
 
+/* 关键修复：移除 max-width:100% / height:auto 的强制缩放
+   PDF 页面在 JS 里已经按容器可用宽高度算好了 scale，canvas 只需要保持原始渲染尺寸 */
 .pdf-viewer canvas {
-  max-width: 100%;
-  height: auto;
+  display: block;
   background: white;
   box-shadow: 0 8px 24px rgba(46, 42, 34, 0.18);
+  /* 不再被父容器挤压，必要时 viewer 会出横向滚动条 */
+  max-width: none;
+  height: auto;
 }
 
 .pdf-loading,
@@ -408,7 +432,8 @@ h2 {
 .pdf-page-wrapper {
   position: relative;
   display: inline-block;
-  margin-bottom: 18px;
+  /* 关键：grid 的 gap 已经提供间距，去掉 margin-bottom 防止视觉上间距过大 */
+  margin: 0;
 }
 
 .textLayer {
@@ -663,7 +688,8 @@ h2 {
   }
 
   .reader-panel {
-    grid-template-rows: auto 68vh;
+    /* 移动端固定一个 70vh 的阅读区，避免被无限拉伸 */
+    grid-template-rows: auto minmax(0, 70vh);
   }
 }
 
@@ -672,13 +698,12 @@ h2 {
     padding: 18px;
   }
 
-  .brand-row,
   .reader-toolbar {
-    display: grid;
+    padding: 12px 14px;
   }
 
-  .reader-toolbar {
-    padding: 16px;
+  .reader-toolbar h2 {
+    font-size: 1.05rem;
   }
 
   .reader-actions,
