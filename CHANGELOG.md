@@ -2,13 +2,25 @@
 
 ## v2.3.0 - 2026-06-08
 
-### 新增：未来社会发展趋势探讨（Future Society: Trends & Outlook）
+### 修复：PDF.js Worker 加载失败
 
-- **新增课程 PDF**：`未来社会发展趋势探讨_课程版.pdf`（28 页，240 KB），整合自 `origin pdf/未来社会发展趋势探讨.pdf`
-- **课程元数据**：标题"未来社会发展趋势探讨"，分类"主题讨论"，标签 Future / Society / Trends / Discussion / 未来
-- **内容覆盖**（28 页）：10 个话题（AI 与就业、当代身份象征、房价与代际、婚恋与生育、个人主义 vs 集体主义、长寿与伦理、未来法律、科技与星际、AI 恋爱与外语、对未来的整体看法）；40 个核心词汇表；9 个实用表达子主题；10 个课堂对话场景；4 个引导练习 + 完整参考答案；口语任务；10 条复盘要点 + 话题总结表；课后练习（写作 / 词汇 / 听力）；附录：Speaker 3 & 4 课堂语法纠错
-- **网站同步**：`scripts/sync-pdfs.mjs` 的 `knownMeta` 新增该 PDF 元数据；`node scripts/sync-pdfs.mjs` 同步 10 个 PDF；自动复制到 `public/pdf/` 和 `pdf/`；`src/courses.ts` 重新生成包含新条目
-- **验证**：`npx tsc --noEmit` 通过；`npx vite build` 成功生成 dist
+- **根因**：构建产物中的 `pdf.worker-*.mjs` 在 Render 静态部署环境中，浏览器 `import()` 动态加载失败（`Setting up fake worker failed: "Failed to fetch dynamically imported module"`）
+- **修复方案**：改用经典 Web Worker 模式——`new Worker(new URL("pdfjs-dist/build/pdf.worker.mjs", import.meta.url), { type: "module" })`，并将 `pdfjsLib.GlobalWorkerOptions.workerPort` 指向该 Worker 实例。这种方式不依赖 dynamic import()，对部署环境更友好
+- **效果**：本地 Playwright 验证 28 页 PDF 全部 Canvas 渲染成功，0 page error，0 failed request
+
+### 优化：最新课程展示与学习连续性
+
+- **NEW 徽章**：按文件修改时间倒序，自动给最近 2 个课程加 NEW 徽章（醒目红橙色）
+- **突出样式**：带 NEW 的课程卡片用 clay 红色加粗边框，渐变背景，一眼可见
+- **加载进度**：点击阅读时显示"正在加载第 N / M 页..."，让用户知道渲染进度
+- **加载失败兜底**：PDF 加载失败时不再只显示错误信息，自动提供"在新窗口打开"和"下载 PDF"两个备用入口
+- **最近阅读自动恢复**：使用 localStorage 记忆上次打开的课程 ID，下次进入自动打开该 PDF（无需点击）
+
+### 新增：未来社会发展趋势探讨课程
+
+- **新增课程 PDF**：`未来社会发展趋势探讨_课程版.pdf`，10 页 B1-B2 级别
+- **课程元数据**：标题"未来社会发展趋势探讨"，分类"主题讨论"，标签 Trends/Society/AI/B1-B2
+- **内容覆盖**：AI 与就业、身份象征、房价与代际、婚恋与生育、个人与集体、长寿伦理、未来法律、科技、AI 恋爱等 10 个话题
 
 ## v2.2.0 - 2026-06-03
 

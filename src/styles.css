@@ -184,6 +184,33 @@ h2 {
   transform: translate(-2px, -2px);
 }
 
+/* 最新上传的课程卡片：突出边框颜色 */
+.course-card.is-new {
+  border-color: var(--clay);
+  border-width: 2px;
+  background: linear-gradient(135deg, rgba(180, 90, 60, 0.04), #fffdf8 60%);
+}
+
+.course-card.is-new:hover,
+.course-card.is-new.is-active {
+  border-color: var(--clay);
+  box-shadow: 7px 7px 0 rgba(180, 90, 60, 0.18);
+}
+
+/* NEW 徽章：醒目红橙色标签 */
+.new-badge {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 3px 8px;
+  color: #fffaf1;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  background: var(--clay);
+  vertical-align: middle;
+  box-shadow: 0 2px 0 rgba(180, 90, 60, 0.4);
+}
+
 .course-body {
   display: grid;
   gap: 8px;
@@ -341,6 +368,32 @@ h2 {
 
 .pdf-error strong {
   color: var(--clay);
+}
+
+.pdf-error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.pdf-error-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  border: 1px solid var(--pine);
+  padding: 6px 12px;
+  color: var(--pine-dark);
+  font-size: 0.85rem;
+  font-weight: 800;
+  background: rgba(40, 87, 67, 0.08);
+  cursor: pointer;
+}
+
+.pdf-error-actions a:hover {
+  color: #fffaf1;
+  background: var(--pine);
 }
 
 .empty-state {

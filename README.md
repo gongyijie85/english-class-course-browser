@@ -2,13 +2,14 @@
 
 Static course browser for the PDF files in `public/pdf`.
 
-## Course List (v2.2.0)
+## Course List (v2.3.0)
 
 | Category | Course | Level |
 |----------|--------|-------|
 | 课堂总结 | Exercise and Health / 锻炼与健康 | A1-A2 |
 | 主题讨论 | Addictions in Modern Life / 现代生活中的成瘾问题与应对 | A1-A2 |
 | 主题讨论 | Trends and Phenomena / 潮流与现象探讨 | A1-A2 |
+| 主题讨论 | 未来社会发展趋势探讨（10 个话题：AI / 婚恋 / 房价） | B1-B2 |
 | 课堂总结 | English Communication Class / 英语交流课课堂要点总结 | A1-A2 |
 | 口语对话 | Speaking Practice / 英语口语表达练习 | A1-A2 |
 | 面试职场 | Interview Skills / 英语学习与面试技巧 | A1-A2 |
